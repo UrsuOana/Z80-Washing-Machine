@@ -22,291 +22,291 @@ VP_PASS_STATUS:
 ;--------------------------------- ORG 3000H ---------------------------------
 
 .org 3000h
-	LD HL, DRY_STATUS       		;REGISTRUL HL E CA UN POINTER, INCARCAM IN EL ADRESA DE MEMORIE A LUI DRY STATUS
-	LD (HL), 001H           		;INITIALIZAM DRY_STATUS
+	LD HL, DRY_STATUS       		
+	LD (HL), 001H           		
 	
 
 LOGIN_MODE_SELECTION:
-	LD D, 0							;initializam registrul d cu 0 
+	LD D, 0							
 	ld IX, BLOC_AFIS_ADM_USR_CHOOSE	;incarcam in ix BLOC_AFIS_ADM_USR_CHOOSE pentru afisare
 
-	CALL SCAN						;apelam functia SCAN pentru citire de la tastatura pana e apasata o tasta
+	CALL SCAN						
 
-	CP TASTA_A						;verificam daca a fost apasata tasta A
-	JP Z, AML_ENTRY					;daca a fost apasata => meniu admin
+	CP TASTA_A						
+	JP Z, AML_ENTRY					
 
-	CP TASTA_B						;verificam daca a fost apasata tasta A
-	JP Z, USER_MODE					;daca a fost apasata => meniu user
+	CP TASTA_B						
+	JP Z, USER_MODE					
 
-	JP LOGIN_MODE_SELECTION			;daca a fost apasata orice alta tasta nu face nimic
+	JP LOGIN_MODE_SELECTION			
 
 ;--------------------------------- Meniu utilizator ---------------------------------
 
 USER_MODE:
-	LD IX, BLOC_AFIS_USER			;incarcam in ix BLOC_AFIS_USER pentru afisare	
-	call SCAN1						;apelam functia SCAN1 pentru a afisa 10ms			
-	inc D							;incrementam registrul D (contor)
+	LD IX, BLOC_AFIS_USER			
+	call SCAN1									
+	inc D							
 
-	ld A, 0C8H						;incarcam in registrul A valoarea 200
-	cp D							;comparam registrul A cu D
+	ld A, 0C8H						
+	cp D							
 	
-	JP NZ, USER_MODE				;daca nu sunt egale => nu au trecut 2 sec => ne reintoarcem in bucla
-	JP MODES_DRY					;daca sunt egale => au trecut 2 secunde => iesim din bucla
+	JP NZ, USER_MODE				
+	JP MODES_DRY					
 
 MODES_DRY:
-	LD IX, BLOC_AFIS_UTILIZ			;incarcam in ix BLOC_AFIS_UTILIZ pentru afisare
-	LD D, 0							;initializam registrul D cu 0
-	LD A, (DRY_STATUS)				;incarcam in registrul A valoarea din variabila DRY_STATUS
-	cp 1							;comparam registrul A cu 1
-	JP Z, MODES_DRY1				;daca sunt egale => stoarcerea activa => moduri spalare cu stoarcere
-	JP MODES_DRY0					;daca nu sunt egale => stoarcerea inactiva => moduri spalare fara stoarcere
+	LD IX, BLOC_AFIS_UTILIZ			
+	LD D, 0							
+	LD A, (DRY_STATUS)				
+	cp 1							
+	JP Z, MODES_DRY1				
+	JP MODES_DRY0					
 
 ;--------------------------------- Moduri spalare fara stoarcere ---------------------------------
 
 MODES_DRY0:
-	CALL SCAN						;apelam functia SCAN pentru citire de la tastatura pana e apasata o tasta
+	CALL SCAN						
 
-	CP 	TASTA_F						;verificam daca a fost apasata tasta F
-	JP Z, Program_Fast0				;daca a fost apasata => programul Fast de spalare	
+	CP 	TASTA_F						
+	JP Z, Program_Fast0				
 
-	cp TASTA_C						;verificam daca a fost apasata tasta C
-	JP Z, Program_Cotton0			;daca a fost apasata => programul Cotton de spalare
+	cp TASTA_C						
+	JP Z, Program_Cotton0			
 
-	CP TASTA_E						;verificam daca a fost apasata tasta E
-	JP Z, Program_Eco0				;daca a fost apasata => programul Eco de spalare
+	CP TASTA_E						
+	JP Z, Program_Eco0				
 
-	CP TASTA_GO						;verificam daca a fost apasata tasta GO
-	JP Z, LOGIN_MODE_SELECTION		;daca a fost apasata => meniu de alegere a tipului de utilizator
+	CP TASTA_GO						
+	JP Z, LOGIN_MODE_SELECTION		
 
-	JP MODES_DRY0					;ignoram orice alta tasta
+	JP MODES_DRY0					
 Program_Fast0:	;1secunda
-	LD IX, BLOC_AFIS_F0				;incarcam in ix BLOC_AFIS_F0 pentru afisare
-	CALL SCAN1						;apelam functia SCAN pentru citire de la tastatura pana e apasata o tasta
-	INC D							;incrementam registrul D ce are rol de contor
+	LD IX, BLOC_AFIS_F0				
+	CALL SCAN1						
+	INC D							
 
-	LD A, 064h						;incarcam in registrul A valoarea 100
-	CP D							;comparam registrul A cu D
-	JP NZ, Program_Fast0			;daca nu sunt egale atunci nu am afisat pentru 1 sec => intram iar in bucla
+	LD A, 064h						
+	CP D							
+	JP NZ, Program_Fast0			
 	
-	LD D, 0							;daca sunt egale incarcam in contor valoarea 0 (pentru a o utiliza in urmatoarea bucla)
-	JP Done_Screen					;si sarim la Done_Screen
+	LD D, 0							
+	JP Done_Screen					
 Program_Cotton0: ;2secunde
-	LD IX, BLOC_AFIS_C0				;incarcam in ix BLOC_AFIS_C0 pentru afisare
-	CALL SCAN1						;apelam functia scan1 pentru afisare de 200ms
-	INC D							;incrementam registrul D ce are rol de contor
+	LD IX, BLOC_AFIS_C0				
+	CALL SCAN1						
+	INC D							
 
-	LD A, 0C8H						;incarcam in registrul A valoarea 200
-	CP D							;comparam registrul A cu D
-	JP NZ, Program_Cotton0			;daca nu sunt egale atunci nu am afisat pentru 2 sec => intram iar in bucla
-	LD D, 0							;daca sunt egale incarcam in contor valoarea 0 (pentru a o utiliza in urmatoarea bucla)
-	JP Done_Screen					;si sarim la Done_Screen
-Program_Eco0: ;2secunde
-	LD IX, BLOC_AFIS_E0				;incarcam in ix BLOC_AFIS_E0 pentru afisare
-	CALL SCAN1						;apelam functia scan1 pentru afisare de 200ms
-	INC D							;incrementam registrul D ce are rol de contor
+	LD A, 0C8H						
+	CP D							
+	JP NZ, Program_Cotton0		
+	LD D, 0				
+	JP Done_Screen			
+Program_Eco0: ;2secund
+	LD IX, BLOC_AFIS_E0			
+	CALL SCAN1				
+	INC D					
 
-	LD A, 0C8H						;incarcam in registrul A valoarea 200
-	CP D							;comparam registrul A cu D
-	JP NZ, Program_Eco0				;daca nu sunt egale atunci nu am afisat pentru 2 sec => intram iar in bucla
-	LD D, 0							;daca sunt egale incarcam in contor valoarea 0 (pentru a o utiliza in urmatoarea bucla)
-	JP Done_Screen					;si sarim la Done_Screen
+	LD A, 0C8H			
+	CP D					
+	JP NZ, Program_Eco0			
+	LD D, 0					
+	JP Done_Screen			
 
 ;--------------------------------- Moduri spalare cu stoarcere ---------------------------------
 
 MODES_DRY1:
-	CALL SCAN						;apelam functia SCAN pentru citire de la tastatura pana e apasata o tasta
+	CALL SCAN			
 
-	CP 	TASTA_F						;verificam daca a fost apasata tasta F
-	JP Z, Program_Fast1				;daca a fost apasata => programul Fast de spalare
+	CP 	TASTA_F				
+	JP Z, Program_Fast1			
 
-	cp TASTA_C						;verificam daca a fost apasata tasta C
-	JP Z, Program_Cotton1			;daca a fost apasata => programul Cotton de spalare
+	cp TASTA_C					
+	JP Z, Program_Cotton1		
 
-	CP TASTA_E						;verificam daca a fost apasata tasta E
-	JP Z, Program_Eco1				;daca a fost apasata => programul Eco de spalare
+	CP TASTA_E					
+	JP Z, Program_Eco1			
 
-	CP TASTA_GO						;verificam daca a fost apasata tasta GO
-	JP Z, LOGIN_MODE_SELECTION		;daca a fost apasata => meniu de alegere a tipului de utilizator
+	CP TASTA_GO					
+	JP Z, LOGIN_MODE_SELECTION	
 
-	JP MODES_DRY1					;ignoram orice alta tasta
+	JP MODES_DRY1			
 Program_Fast1: ;1secunda
-	LD IX, BLOC_AFIS_F1             ;incarcam in ix BLOC_AFIS_F1 pentru afisare
-	CALL SCAN1						;apelam functia scan1 pentru afisare de 100ms
-	INC D							;incrementam registrul D ce are rol de contor
+	LD IX, BLOC_AFIS_F1            
+	CALL SCAN1			
+	INC D				
 
-	LD A, 064h						;incarcam in registrul A valoarea 100
-	CP D							;comparam registrul A cu D
-	JP NZ, Program_Fast1			;daca nu sunt egale atunci nu am afisat pentru 1 sec => intram iar in bucla
+	LD A, 064h			
+	CP D				
+	JP NZ, Program_Fast1		
 
-	LD D, 0							;daca sunt egale incarcam in contor valoarea 0 (pentru a o utiliza in urmatoarea bucla)
-	JP Done_Screen					;si sarim la Done_Screen
+	LD D, 0				
+	JP Done_Screen			
 Program_Cotton1: ;2secunde
-	LD IX, BLOC_AFIS_C1 			;incarcam in ix BLOC_AFIS_C1  pentru afisare
-	CALL SCAN1						;apelam functia scan1 pentru afisare de 200ms
-	INC D							;incrementam registrul D ce are rol de contor
+	LD IX, BLOC_AFIS_C1 		
+	CALL SCAN1			
+	INC D				
 
-	LD A, 0C8H						;incarcam in registrul A valoarea 200
-	CP D							;comparam registrul A cu D
-	JP NZ, Program_Cotton1			;daca nu sunt egale atunci nu am afisat pentru 2 sec => intram iar in bucla
+	LD A, 0C8H			
+	CP D				
+	JP NZ, Program_Cotton1		
 
-	LD D, 0							;daca sunt egale incarcam in contor valoarea 0 (pentru a o utiliza in urmatoarea bucla)
-	JP Done_Screen					;si sarim la Done_Screen
+	LD D, 0			
+	JP Done_Screen			
 Program_Eco1: ;2secunde
-	LD IX, BLOC_AFIS_E1				;incarcam in ix BLOC_AFIS_E1  pentru afisare
-	CALL SCAN1						;apelam functia scan1 pentru afisare de 200ms
-	INC D							;incrementam registrul D ce are rol de contor
+	LD IX, BLOC_AFIS_E1			
+	CALL SCAN1				
+	INC D					
 
-	LD A, 0C8H						;incarcam in registrul A valoarea 200
-	CP D							;comparam registrul A cu D
-	JP NZ, Program_Eco1				;daca nu sunt egale atunci nu am afisat pentru 2 sec => intram iar in bucla
+	LD A, 0C8H			
+	CP D				
+	JP NZ, Program_Eco1		
 
-	LD D, 0							;daca sunt egale incarcam in contor valoarea 0 (pentru a o utiliza in urmatoarea bucla)
-	JP Done_Screen					;si sarim la Done_Screen
-
+	LD D, 0			
+	JP Done_Screen			
 
 Done_Screen: ;2secunde
-	LD IX, BLOC_AFIS_done			;incarcam in ix BLOC_AFIS_done pentru afisare
-	CALL SCAN1						;apelam functia scan1 pentru afisare de 200ms
-	INC D							;incrementam registrul D ce are rol de contor
+	LD IX, BLOC_AFIS_done	
+	CALL SCAN1				
+	INC D					
 
-	LD A, 0C8H						;incarcam in registrul A valoarea 200
-	CP D							;comparam registrul A cu D
-	JP NZ, Done_Screen				;daca nu sunt egale atunci nu am afisat pentru 2 sec => intram iar in bucla	
+	LD A, 0C8H				
+	CP D						
+	JP NZ, Done_Screen		
 
-	LD D, 0							;daca sunt egale incarcam in contor valoarea 0 (pentru a o utiliza in urmatoarea bucla)
-	JP LOGIN_MODE_SELECTION			;si ne intoarcem la meniul de selectie a tipului de utilizator	
+	LD D, 0						
+	JP LOGIN_MODE_SELECTION			
 
 ;--------------------------------- Meniu admin ---------------------------------
 
 ;---------- Logica implementata la laborator ---------- 
+
 AML_ENTRY:
-	ld HL , AML_CONTOR				;incarcam in registrul HL valoarea din variabila AML_CONTOR
-	ld (HL) , 000h					;initializam registrul HL cu valoarea 0
+	ld HL , AML_CONTOR
+	ld (HL) , 000h				
 	
-	ld ix, AML_BUFFER_IMPLEMENTARE	;incarcam in registrul ix AML_BUFFER_IMPLEMENTARE pentru afisare
+	ld ix, AML_BUFFER_IMPLEMENTARE	
 AML_AFISARE_PASS:
-	call SCAN						;apelam functia SCAN pentru citire de la tastatura pana e apasata o tasta
-	cp TASTA_GO						;verificam daca a fost apasata tasta GO
-	jp IP_ENTRY						;daca a fost apasata sarim la IP_ENTRY
-	jp nz, AML_AFISARE_PASS			;daca a fost apasat altceva ignoram	
+	call SCAN					
+	cp TASTA_GO						
+	jp IP_ENTRY			
+	jp nz, AML_AFISARE_PASS			
 IP_ENTRY:
-	LD C, 00H						;vom utiliza registrul C drept contor si il initializam cu 0
-	LD HL, IP_PASS_UTIL 			;in registrul HL incarcam IP_PASS_UTIL
+	LD C, 00H				
+	LD HL, IP_PASS_UTIL 			
 IP_LOOP:
-	LD (HL), 00H					;initializam registrul HL cu valoarea 0  
-	INC C							;incrementam contorul
-	INC HL							;incrementam valoarea din registrul HL (IP_PASS_UTIL) 
-	LD A, C							;incarcam in registrul A valoarea din contor
-	CP 06H							;verificam daca valoarea din registrul A (contorul) e egala cu 6
-	JP NZ, IP_LOOP					;daca nu e egala => nu s-au introdus toate cifrele parolei => reluam bucla
-	LD IX, IP_BLOC_AFIS				;incarcam in registrul IX IP_BLOC_AFIS pentru afisare
-	LD C, 00H						;incarcam in registrul C 0 
+	LD (HL), 00H					
+	INC C							
+	INC HL							
+	LD A, C							
+	CP 06H							
+	JP NZ, IP_LOOP					
+	LD IX, IP_BLOC_AFIS				
+	LD C, 00H						
 IP_LOOP_PASS:
-	CALL SCAN						;apelam functia scan			  
-	LD HL, IP_PASS_UTIL				;incarcam in HL IP_PASS_UTIL
-	LD B, 00H						;incarcam in B valoarea 0
-	ADD HL, BC						;adaugam in registrul HL BC (0)
-	LD (HL), A						;in HL incarcam A 
-	INC IX							;incrementam registrul IX (pentru afisare -)
-	INC C							;incrementam C (contorul)
-	LD A, C							;incarcam in registrul A C(contorul)
-	CP 06h							;comparam A (contorul) cu 6
-	JP NZ, IP_LOOP_PASS				;daca e diferit => nu au fost introdusa toata parola =>reluam bucla
+	CALL SCAN								  
+	LD HL, IP_PASS_UTIL				
+	LD B, 00H					
+	ADD HL, BC					
+	LD (HL), A					
+	INC IX						
+	INC C					
+	LD A, C						
+	CP 06h						
+	JP NZ, IP_LOOP_PASS				
 IP_LOOP_GO:
-	CALL SCAN 						;apelam functia scan pentru citire de la tastatura
-	CP TASTA_GO						;verificam daca tasta apasata e GO
-	JP NZ, IP_LOOP_GO				;daca nu a fost apasat GO => ne intoarcem in IP_LOOP_GO
-	JP VP_ENTRY						;daca a fost apasat => parola introdusa => VP_ENTRY
+	CALL SCAN 					
+	CP TASTA_GO					
+	JP NZ, IP_LOOP_GO				
+	JP VP_ENTRY						
 VP_ENTRY:
-	LD HL, VP_PASS_STATUS		;incarcam in HL VP_PASS_STATUS
-	LD (HL), 1					;incarcam 1 in HL (VP_PASS_STATUS)
-	LD C, 00H					;initializam cu 0 registrul C pe care il vom folosi ca si contor
+	LD HL, VP_PASS_STATUS		
+	LD (HL), 1					
+	LD C, 00H					
 VP_LOOP_VERIFPASS:
-	LD HL, VP_PASS_STATIC		;incarcam in HL VP_PASS_STATIC 
-	LD B, 00H					;initializam cu 0 registrul B
-	ADD HL, BC					;adaugam la HL BC 
-	LD A,(HL)					;incarcam in registrul A HL (VP_PASS_STATIC )
+	LD HL, VP_PASS_STATIC		
+	LD B, 00H					
+	ADD HL, BC					
+	LD A,(HL)					
 	
-	LD HL, IP_PASS_UTIL			;incarcam in HL IP_PASS_UTIL
-	LD B, 00H					;initializam cu 0 registrul B
-	ADD HL, BC					;adaugam la HL BC 
-	LD B,(HL)					;incarcam in registrul B HL (VP_PASS_UTIL )
-	CP B						;comparam A (VP_PASS_STATIC) cu B (VP_PASS_UTIL)
-	JP NZ, VP_PASS_ERROR		;daca nu sunt egale => parola gresita
-	INC C						;daca sunt egale incrementam C (contor)
-	LD A, 06H					;incarcam in registrul A valoarea 6
-	CP C						;comparam registrul A cu C (contor)
-	JP NZ, VP_LOOP_VERIFPASS	;daca nu sunt egale => nu s-au introdus toate cifrele => ne intoarcem in bucla de verificare a parolei
+	LD HL, IP_PASS_UTIL			
+	LD B, 00H					
+	ADD HL, BC					
+	LD B,(HL)					
+	CP B						
+	JP NZ, VP_PASS_ERROR		
+	INC C					
+	LD A, 06H					
+	CP C						
+	JP NZ, VP_LOOP_VERIFPASS	
 VP_PASS_GOOD:	;parola corecta
-	LD HL, VP_PASS_STATUS			;incarcam in registrul HL VP_PASS_STATUS
-	LD (HL), 00H					;incarcam in HL (VP_PASS_STATUS) valoarea 0
-	JP A_ENTRY						;sarim in A_ENTRY	
+	LD HL, VP_PASS_STATUS			
+	LD (HL), 00H				
+	JP A_ENTRY							
 VP_PASS_ERROR:	;parola incorecta
-	LD HL, VP_PASS_STATUS			;incarcam in registrul HL VP_PASS_STATUS 
-	LD (HL), 01H					;incarcam in HL (VP_PASS_STATUS) valoarea 1
-	JP A_ENTRY						;sarim in A_ENTRY
+	LD HL, VP_PASS_STATUS			 
+	LD (HL), 01H					
+	JP A_ENTRY						
 
 
 A_ENTRY:
-    LD A, (VP_PASS_STATUS)			;incarcam in registrul A valoarea din VP_PASS_STATUS
-    CP 00H							;comparam registrul A (VP_PASS_STATUS) cu 0
-    JP Z, ADM_ENTRY					;daca sunt egale => parola corecta => intram in meniul de admin
-    JP VC_ENTRY						;daca nu sunt egale => parola incorecta => sarim la VC_ENTRY care verifica de cate ori a fost introdusa parola gresita
+    LD A, (VP_PASS_STATUS)			
+    CP 00H						
+    JP Z, ADM_ENTRY					
+    JP VC_ENTRY					
 VC_ENTRY:
-	ld hl, AML_CONTOR				;incarcam in registrul HL AML_CONTOR
-	ld a, (hl)						;valoarea din registrul HL o incarcam in A
-	inc a							;incrementam valoarea din registrul A
-	cp 3							;comparam valoarea din registrul A cu 3
-	jp z, LOGIN_MODE_SELECTION		;daca sunt egale => a fost introdusa parola gresita de 3 ori => sarim la selectarea tipului de utilizator
-	ld (hl), a						;daca nu sunt egale => introducem valoarea din registrul A in HL (incrementam AML_CONTOR)
-	jp IP_ENTRY						;ne intoarcem la introducerea de parola
+	ld hl, AML_CONTOR			
+	ld a, (hl)					
+	inc a						
+	cp 3						
+	jp z, LOGIN_MODE_SELECTION	
+	ld (hl), a					
+	jp IP_ENTRY					
 
 
 ADM_ENTRY:
-	ld IX, BLOC_AFIS_ADM				;incarcam in registrul ix BLOC_AFIS_ADM	pentru afisare	
-	call SCAN1							;apelam functia SCAN1 pentru a afisa 10ms 
-    INC D								;incrementam D (contorul)
+	ld IX, BLOC_AFIS_ADM			
+	call SCAN1							
+    INC D							
 	
-	LD A, 0C8H							;incarcam in registrul A valoarea 200							
-	CP D								;comparam valoarea din D (contor) cu valoarea din A
-	JP NZ, ADM_ENTRY					;daca nu sunt egale => nu au trecut 2 sec => repetam bucla
+	LD A, 0C8H													
+	CP D							
+	JP NZ, ADM_ENTRY				
 
-    JP DRY_OP_ENTRY						;daca sunt egale => au trecut 2 sec => iesim din bucla
+    JP DRY_OP_ENTRY					
 DRY_OP_ENTRY:
-    ld A, (DRY_STATUS)					;incarcam in registrul A valoarea din variabila DRY_STATUS
-    CP 000H								;comparam cu 0 valoarea din A
-    JP Z, Dry0							;daca sunt egale => stoarcerea e dezactivata => intram in Dry0
-    JP Dry1								;daca nu sunt egale => stoarcerea e activata => intram in Dry1
+    ld A, (DRY_STATUS)				
+    CP 000H							
+    JP Z, Dry0						
+    JP Dry1							
 Dry0:
-    ld ix, BLOC_AFIS_dry0				;incarcam in registrul ix BLOC_AFIS_dry0 pentru afisare
-    call SCAN							;apelam functia SCAN pentru citire de la tastatura pana e apasata o tasta
+    ld ix, BLOC_AFIS_dry0			
+    call SCAN						
     
-	CP TASTA_1							;comparam tasta apasata cu tasta 1
-    jp Z, ENABLE_DRY					;daca s-a apasat 1 => activam stoarcerea
+	CP TASTA_1					
+    jp Z, ENABLE_DRY				
 
-	CP TASTA_GO							;comparam tasta apasata cu tasta GO
-	JP Z, LOGIN_MODE_SELECTION			;daca s-a apasat GO => iesim in meniul de selectare a tipului de utilizator
+	CP TASTA_GO						
+	JP Z, LOGIN_MODE_SELECTION
 	
-	JP Dry0								;daca nici una din cele 2 taste nu a fost apasata ignoram
+	JP Dry0							
 Dry1:
-    ld ix, BLOC_AFIS_dry1				;incarcam in registrul ix BLOC_AFIS_dry1 pentru afisare
-    call SCAN							;apelam functia SCAN pentru citire de la tastatura pana e apasata o tasta
+    ld ix, BLOC_AFIS_dry1				
+    call SCAN							
     
-	CP TASTA_0							;comparam tasta apasata cu tasta 0
-    jp Z, DISABLE_DRY					;daca s-a apasat 0 => dezactivam stoarcerea
+	CP TASTA_0							
+    jp Z, DISABLE_DRY					
 	
-	CP TASTA_GO							;comparam tasta apasata cu tasta GO
-	JP Z, LOGIN_MODE_SELECTION			;daca s-a apasat GO => iesim in meniul de selectare a tipului de utilizator
+	CP TASTA_GO						
+	JP Z, LOGIN_MODE_SELECTION			
 	
-	JP Dry1								;daca nici una din cele 2 taste nu a fost apasata ignoram
+	JP Dry1								
 DISABLE_DRY:
-	LD HL, DRY_STATUS		;incarcam in registrul HL DRY_STATUS
-	LD (HL), 00h			;setam valoarea din DRY_STATUS 0 => stoarcere dezactivata
-	JP Dry0					;sarim la eticheta de stoarcere dezactivata
+	LD HL, DRY_STATUS		
+	LD (HL), 00h			
+	JP Dry0				
 ENABLE_DRY:
-	LD HL, DRY_STATUS		;incarcam in registrul HL DRY_STATUS	
-	LD (HL), 1				;setam valoarea din DRY_STATUS 1 => stoarcere activata
-	JP Dry1					;sarim la eticheta de stoarcere activata
+	LD HL, DRY_STATUS	
+	LD (HL), 1				
+	JP Dry1				
 
 ;------------------------------- BLOCURI AFISARE---------------------------------
 
@@ -433,8 +433,8 @@ VP_PASS_STATIC:
 	.DB 03H
 
 SCAN 			.equ 05FEH	
-SCAN1           .equ 0624H		
-TASTA_GO	    .equ 012h
+SCAN1         		.equ 0624H		
+TASTA_GO	    	.equ 012h
 TASTA_0			.equ 00H
 TASTA_1			.equ 01H
 TASTA_A 		.equ 0Ah
@@ -444,4 +444,5 @@ TASTA_E			.equ 0EH
 TASTA_F			.equ 0FH
 
 .end
-	rst 38h
+
+rst 38h
