@@ -113,9 +113,7 @@ Dispozitiv de intrare. E structurata sub forma matriceala, in fiecare nod de int
 
 <br>&emsp;
 ![image](https://user-images.githubusercontent.com/103102760/230600107-2d10ef97-ac76-4b6c-9ae5-11f542b28743.png)
-&emsp;
 ![image](https://user-images.githubusercontent.com/103102760/230600120-68a2008f-782e-4d87-806f-41e781508151.png)
-&emsp;
 ![image](https://user-images.githubusercontent.com/103102760/230600139-b897a9cc-f9cf-4af1-8f79-a78908e4dbf2.png)
 
 
@@ -134,9 +132,7 @@ Dispozitiv de intrare. E structurata sub forma matriceala, in fiecare nod de int
 
 <br>&emsp;
 ![image](https://user-images.githubusercontent.com/103102760/230600247-dd16f2f9-cb29-4f01-895c-ce3de0f9671a.png)
-&emsp;
 ![image](https://user-images.githubusercontent.com/103102760/230600261-3f21fcb5-4aec-4c7b-8ea1-4ed33f8c95b2.png)
-&emsp;
 ![image](https://user-images.githubusercontent.com/103102760/230600270-597b2e25-6085-4d01-9840-9dfa1c8ec145.png)
 
 
